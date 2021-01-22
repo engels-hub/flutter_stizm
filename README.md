@@ -1,1 +1,2 @@
-# Stundu Izmaiņu aplikācijas projekts Android ierīcēm
+# Stundu Izmaiņas 
+Stundu Izmaiņu aplikācijas projekts Android ierīcēm
