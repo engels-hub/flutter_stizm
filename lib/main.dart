@@ -45,7 +45,7 @@ void main() {
               ),
               primaryColor: Colors.grey[900],
               cardColor: Colors.grey[800],
-              accentColor: Color.fromARGB(255, 0, 0, 200),
+              accentColor: Color.fromARGB(255, 0, 0, 60),
               appBarTheme: AppBarTheme(
                 textTheme: TextTheme(headline6: AppBarStyle),
               ),
