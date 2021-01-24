@@ -23,7 +23,7 @@ class _LoadingState extends State<Loading> {
       if (!(table.error || ttable.error)) {
         Navigator.pushReplacementNamed(context, '/st', arguments: {
           'values': table.values,
-          'values_tom': ttable.values,
+          //'values_tom': ttable.values,
           'today_data':table.datatest,
         }); //if on local_preference '/t' or '/st'
       } else {
@@ -48,9 +48,6 @@ class _LoadingState extends State<Loading> {
 
 
   }
-
-
-
 
   @override
   Widget build(BuildContext context) {

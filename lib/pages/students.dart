@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter1/service/style.dart';
+import 'package:theme_provider/theme_provider.dart';
 
 class Students extends StatefulWidget {
   @override
@@ -9,7 +11,8 @@ class _StudentsState extends State<Students> {
   Map args = {};
   List data;
   Map lesson = {};
-
+  bool dark_theme=false;
+  var buttonIcon=Icons.nightlight_round;
   @override
   void initState() {
     super.initState();
@@ -18,7 +21,7 @@ class _StudentsState extends State<Students> {
   String lv_loc(String DayofWeek, int timestamp) {
     var date =
         DateTime.fromMillisecondsSinceEpoch(timestamp * 1000, isUtc: true);
-    print(date.toString());
+
     String lv = '';
     switch (DayofWeek) {
       case "Monday":
@@ -141,27 +144,22 @@ class _StudentsState extends State<Students> {
     args = ModalRoute.of(context).settings.arguments;
     data = args['today_data'];
 
-    String datums =
-        lv_loc(data[0]["DayOfWeek"].toString(), int.parse(data[0]["Date"]));
 
-    //dayWeek(int.parse(data[0]["Date"]));
 
+    String datums = lv_loc(data[0]["DayOfWeek"].toString(), int.parse(data[0]["Date"]));
     return Container(
-      decoration: BoxDecoration(
+      /*decoration: BoxDecoration(
           image: DecorationImage(
-
-
-            image: AssetImage("assets/bg.png"), repeat: ImageRepeat.repeat, )),
+            image: AssetImage("assets/bg.png"), repeat: ImageRepeat.repeat)),*/
       child: Scaffold(
-        backgroundColor: Color(0x00000000),
+        //backgroundColor: Color(0x00000000),
+
         appBar: AppBar(
             title: Text(
               'Stundu Izmaiņas',
-              style: TextStyle(
-                fontSize: 16,
-              ),
+
             ),
-            backgroundColor: Color.fromARGB(255, 0, 0, 80),
+            //backgroundColor: Color.fromARGB(255, 0, 0, 80),
             leading: Container(
               margin: EdgeInsets.fromLTRB(25.0, 0.0, 0.0, 0),
               child: ImageIcon(
@@ -169,6 +167,27 @@ class _StudentsState extends State<Students> {
               ),
             ),
             actions: <Widget>[
+              IconButton(
+                icon: Icon(buttonIcon),
+                tooltip: 'Tomorrow',
+                onPressed: () {
+
+
+                  setState(() {
+                    print('hello');
+                    if(dark_theme){
+                      buttonIcon=Icons.nightlight_round;
+                      dark_theme=false;
+                    }else{
+                      buttonIcon=Icons.wb_sunny;
+                      dark_theme=true;
+                    }
+                    print(buttonIcon.toString());
+                  });
+                  ThemeProvider.controllerOf(context).nextTheme();
+                  print(ThemeProvider.themeOf(context).data.toString());
+                },
+              ),
               IconButton(
                 icon: const Icon(Icons.wifi_protected_setup),
                 tooltip: 'Teacher view',
@@ -189,6 +208,7 @@ class _StudentsState extends State<Students> {
                   });
                 },
               ),
+
             ]),
         body: Scrollbar(
           child: ListView.builder(
@@ -203,25 +223,18 @@ class _StudentsState extends State<Students> {
                     children: <Widget>[
                       Text(
                         'Izmaiņas',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
-                        ),
+                        style: Theme.of(context).textTheme.headline6,
                       ),
                       Text(
                         datums,
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
-                        ),
+                        style: Theme.of(context).textTheme.headline6,
                       ),
                     ],
                   ),
                 );
               } else {
-                final theme =
-                    Theme.of(context).copyWith(dividerColor: Colors.transparent);
-
+                final theme =Theme.of(context).copyWith(dividerColor: Colors.transparent);
+                final divs =DividerTheme.of(context).copyWith(thickness: 2.0);
                 String name = data[0]["Classes"][index - 1]["Class"];
                 if (name.length == 3) {
                   name = name.substring(0, name.length - 1) +
@@ -242,16 +255,14 @@ class _StudentsState extends State<Students> {
                       data: theme, //new
 
                       child: ExpansionTile(
+
                         expandedCrossAxisAlignment: CrossAxisAlignment.start,
                         title: Container(
+
                           padding: EdgeInsets.fromLTRB(10.0, 10.0, 26.0, 10.0),
                           child: Text(
                             name, //10.a
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black38,
-                              fontSize: 16,
-                            ),
+                            style: Theme.of(context).textTheme.headline6,
                           ),
                         ),
                         children: <Widget>[
@@ -264,9 +275,12 @@ class _StudentsState extends State<Students> {
                                 if (data[0]["Classes"][index - 1]["Lessons"][i]["Rooms"].length !=0) {
                                   return Column(
                                     children: <Widget>[
-                                      Divider(
-                                        color: Colors.black12,
-                                        thickness: 2.5,
+                                      DividerTheme(
+                                        data:divs,
+                                        child: Divider(
+                                          //color: Colors.black12,
+
+                                        ),
                                       ),
                                       Container(
                                         padding: EdgeInsets.fromLTRB(
@@ -277,11 +291,7 @@ class _StudentsState extends State<Students> {
                                                   ["Lessons"][i]["LessonNumber"] +
                                               '. ', //lessonnumber
                                           textAlign: TextAlign.left,
-                                          style: TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                            color: Colors.black54,
-                                            fontSize: 14,
-                                          ),
+
                                         ),
                                       ),
                                       ListView.builder(
@@ -291,10 +301,6 @@ class _StudentsState extends State<Students> {
                                                   ["Lessons"][i]["Rooms"]
                                               .length, //rooms
                                           itemBuilder: (context, j) {
-                                            print(data[0]["Classes"][index - 1]
-                                                        ["Lessons"][i]["Rooms"][j]
-                                                    ["Note"]
-                                                .toString());
                                             if (data[0]["Classes"][index - 1]
                                                         ["Lessons"][i]["Rooms"][j]
                                                     ["Note"] !=
@@ -304,8 +310,8 @@ class _StudentsState extends State<Students> {
                                                     CrossAxisAlignment.start,
                                                 children: <Widget>[
                                                   Divider(
-                                                    color: Colors.black12,
-                                                    thickness: 2.5,
+                                                    
+
                                                   ),
                                                   Container(
                                                     padding: EdgeInsets.fromLTRB(
@@ -318,17 +324,12 @@ class _StudentsState extends State<Students> {
                                                               ["Room"] +
                                                           '. ', //room
                                                       textAlign: TextAlign.left,
-                                                      style: TextStyle(
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                        color: Colors.black54,
-                                                        fontSize: 14,
-                                                      ),
+
                                                     ),
                                                   ),
                                                   Divider(
-                                                    color: Colors.black12,
-                                                    thickness: 1.5,
+                                                    
+
                                                   ),
                                                   Container(
                                                     padding: EdgeInsets.fromLTRB(
@@ -343,17 +344,12 @@ class _StudentsState extends State<Students> {
                                                               ["Subject"],
                                                       //subject
                                                       textAlign: TextAlign.left,
-                                                      style: TextStyle(
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                        color: Colors.black54,
-                                                        fontSize: 14,
-                                                      ),
+
                                                     ),
                                                   ),
                                                   Divider(
-                                                    color: Colors.black12,
-                                                    thickness: 1.5,
+                                                    
+
                                                   ),
                                                   Container(
                                                     padding: EdgeInsets.fromLTRB(
@@ -368,17 +364,12 @@ class _StudentsState extends State<Students> {
                                                               ["TeacherName"],
                                                       //TeacherName
                                                       textAlign: TextAlign.left,
-                                                      style: TextStyle(
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                        color: Colors.black54,
-                                                        fontSize: 14,
-                                                      ),
+
                                                     ),
                                                   ),
                                                   Divider(
-                                                    color: Colors.black12,
-                                                    thickness: 1.5,
+                                                    
+
                                                   ),
                                                   Container(
                                                     padding: EdgeInsets.fromLTRB(
@@ -393,28 +384,20 @@ class _StudentsState extends State<Students> {
                                                               "Note"]["NoteText"],
                                                       //Notetext
                                                       textAlign: TextAlign.left,
-                                                      style: TextStyle(
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                        color: Colors.black54,
-                                                        fontSize: 14,
-                                                      ),
+
                                                     ),
                                                   ),
                                                 ],
                                               );
                                             } else {
-                                              print(data[0]["Classes"][index - 1]
-                                                          ["Lessons"][i]["Rooms"]
-                                                      [j]["Room"]
-                                                  .toString());
+
                                               return Column(
                                                 crossAxisAlignment:
                                                     CrossAxisAlignment.start,
                                                 children: <Widget>[
                                                   Divider(
-                                                    color: Colors.black12,
-                                                    thickness: 2.5,
+                                                    
+
                                                   ),
                                                   Container(
                                                     padding: EdgeInsets.fromLTRB(
@@ -427,17 +410,12 @@ class _StudentsState extends State<Students> {
                                                               ["Room"] +
                                                           '. ', //room
                                                       textAlign: TextAlign.left,
-                                                      style: TextStyle(
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                        color: Colors.black54,
-                                                        fontSize: 14,
-                                                      ),
+
                                                     ),
                                                   ),
                                                   Divider(
-                                                    color: Colors.black12,
-                                                    thickness: 1.5,
+                                                    
+
                                                   ),
                                                   Container(
                                                     padding: EdgeInsets.fromLTRB(
@@ -452,17 +430,12 @@ class _StudentsState extends State<Students> {
                                                               ["Subject"],
                                                       //subject
                                                       textAlign: TextAlign.left,
-                                                      style: TextStyle(
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                        color: Colors.black54,
-                                                        fontSize: 14,
-                                                      ),
+
                                                     ),
                                                   ),
                                                   Divider(
-                                                    color: Colors.black12,
-                                                    thickness: 1.5,
+                                                    
+
                                                   ),
                                                   Container(
                                                     padding: EdgeInsets.fromLTRB(
@@ -478,12 +451,7 @@ class _StudentsState extends State<Students> {
                                                               .toString(),
                                                       //TeacherName
                                                       textAlign: TextAlign.left,
-                                                      style: TextStyle(
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                        color: Colors.black54,
-                                                        fontSize: 14,
-                                                      ),
+
                                                     ),
                                                   ),
                                                 ],
@@ -495,9 +463,11 @@ class _StudentsState extends State<Students> {
                                 }else{
                                   return Column(
                                     children: <Widget>[
-                                  Divider(
-                                  color: Colors.black12,
-                                    thickness: 2.5,
+                                  DividerTheme(
+                                    data:divs,
+                                    child: Divider(
+
+                                    ),
                                   ),
                                 Container(
                                 padding: EdgeInsets.fromLTRB(
@@ -508,16 +478,12 @@ class _StudentsState extends State<Students> {
                                 ["Lessons"][i]["LessonNumber"] +
                                 '. ', //lessonnumber
                                 textAlign: TextAlign.left,
-                                style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black54,
-                                fontSize: 14,
-                                ),
+
                                 ),
                                 ),
                                 Divider(
-                                color: Colors.black12,
-                                thickness: 2.5,
+                                  
+
                                 ),
                                 Container(
                                 padding: EdgeInsets.fromLTRB(
@@ -525,11 +491,7 @@ class _StudentsState extends State<Students> {
                                 child: Text(
                                 'Nenotiek!', //lessonnumber
                                 textAlign: TextAlign.center,
-                                style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black54,
-                                fontSize: 16,
-                                ),
+
                                 ),
                                 ),
                                   ]);
