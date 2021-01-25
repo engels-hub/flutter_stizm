@@ -12,7 +12,7 @@ class _StudentsState extends State<Students> {
   List data;
   Map lesson = {};
   bool dark_theme=false;
-  var buttonIcon=Icons.nightlight_round;
+  var buttonIcon=Icons.bedtime;
   @override
   void initState() {
     super.initState();
@@ -144,7 +144,11 @@ class _StudentsState extends State<Students> {
     args = ModalRoute.of(context).settings.arguments;
     data = args['today_data'];
 
-
+    print(ThemeProvider.themeOf(context).id.toString());
+    if(ThemeProvider.themeOf(context).id.toString()!='light_theme1'){
+      buttonIcon=Icons.wb_sunny;
+      dark_theme=true;
+    }
 
     String datums = lv_loc(data[0]["DayOfWeek"].toString(), int.parse(data[0]["Date"]));
     return Container(
@@ -176,7 +180,7 @@ class _StudentsState extends State<Students> {
                   setState(() {
                     print('hello');
                     if(dark_theme){
-                      buttonIcon=Icons.nightlight_round;
+                      buttonIcon=Icons.bedtime;
                       dark_theme=false;
                     }else{
                       buttonIcon=Icons.wb_sunny;

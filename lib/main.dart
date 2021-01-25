@@ -11,6 +11,8 @@ import 'package:theme_provider/theme_provider.dart';
 void main() {
   runApp(
       ThemeProvider(
+        saveThemesOnChange: true,
+        loadThemeOnInit: true,
         themes: [
 
           AppTheme(
