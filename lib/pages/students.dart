@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter1/service/style.dart';
 import 'package:theme_provider/theme_provider.dart';
 
 class Students extends StatefulWidget {
@@ -9,7 +8,7 @@ class Students extends StatefulWidget {
 
 class _StudentsState extends State<Students> {
   Map args = {};
-  List data;
+  Map data;
   Map lesson = {};
   bool dark_theme=false;
   var buttonIcon=Icons.bedtime;
@@ -142,7 +141,7 @@ class _StudentsState extends State<Students> {
   @override
   Widget build(BuildContext context) {
     args = ModalRoute.of(context).settings.arguments;
-    data = args['today_data'];
+    data = args['values'];
 
     print(ThemeProvider.themeOf(context).id.toString());
     if(ThemeProvider.themeOf(context).id.toString()!='light_theme1'){
@@ -150,7 +149,7 @@ class _StudentsState extends State<Students> {
       dark_theme=true;
     }
 
-    String datums = lv_loc(data[0]["DayOfWeek"].toString(), int.parse(data[0]["Date"]));
+    String datums = lv_loc(data["DayOfWeek"].toString(), int.parse(data["Date"]));
     return Container(
       /*decoration: BoxDecoration(
           image: DecorationImage(
@@ -199,6 +198,7 @@ class _StudentsState extends State<Students> {
                   Navigator.pushReplacementNamed(context, '/t', arguments: {
                     'values': args['values'],
                     'values_tom': args['values_tom'],
+                    't_values':args['t_values'],
                   });
                 },
               ),
@@ -209,6 +209,7 @@ class _StudentsState extends State<Students> {
                   Navigator.pushReplacementNamed(context, '/stt', arguments: {
                     'values': args['values'],
                     'values_tom': args['values_tom'],
+                    't_values':args['t_values'],
                   });
                 },
               ),
@@ -217,7 +218,7 @@ class _StudentsState extends State<Students> {
         body: Scrollbar(
           child: ListView.builder(
             padding: EdgeInsets.fromLTRB(0, 0, 0, 30.0),
-            itemCount: data[0]["Classes"].length + 1,
+            itemCount: data["Classes"].length + 1,
             itemBuilder: (context, index) {
               if (index == 0) {
                 return Container(
@@ -239,7 +240,7 @@ class _StudentsState extends State<Students> {
               } else {
                 final theme =Theme.of(context).copyWith(dividerColor: Colors.transparent);
                 final divs =DividerTheme.of(context).copyWith(thickness: 2.0);
-                String name = data[0]["Classes"][index - 1]["Class"];
+                String name = data["Classes"][index - 1]["Class"];
                 if (name.length == 3) {
                   name = name.substring(0, name.length - 1) +
                       '.' +
@@ -273,10 +274,10 @@ class _StudentsState extends State<Students> {
                           ListView.builder(
                               shrinkWrap: true,
                               physics: ScrollPhysics(),
-                              itemCount: data[0]["Classes"][index - 1]["Lessons"]
+                              itemCount: data["Classes"][index - 1]["Lessons"]
                                   .length, //Lessons
                               itemBuilder: (context, i) {
-                                if (data[0]["Classes"][index - 1]["Lessons"][i]["Rooms"].length !=0) {
+                                if (data["Classes"][index - 1]["Lessons"][i]["Rooms"].length !=0) {
                                   return Column(
                                     children: <Widget>[
                                       DividerTheme(
@@ -291,7 +292,7 @@ class _StudentsState extends State<Students> {
                                             26.0, 10.0, 26.0, 10),
                                         child: Text(
                                           'Stunda: ' +
-                                              data[0]["Classes"][index - 1]
+                                              data["Classes"][index - 1]
                                                   ["Lessons"][i]["LessonNumber"] +
                                               '. ', //lessonnumber
                                           textAlign: TextAlign.left,
@@ -301,11 +302,11 @@ class _StudentsState extends State<Students> {
                                       ListView.builder(
                                           shrinkWrap: true,
                                           physics: ScrollPhysics(),
-                                          itemCount: data[0]["Classes"][index - 1]
+                                          itemCount: data["Classes"][index - 1]
                                                   ["Lessons"][i]["Rooms"]
                                               .length, //rooms
                                           itemBuilder: (context, j) {
-                                            if (data[0]["Classes"][index - 1]
+                                            if (data["Classes"][index - 1]
                                                         ["Lessons"][i]["Rooms"][j]
                                                     ["Note"] !=
                                                 null) {
@@ -321,7 +322,7 @@ class _StudentsState extends State<Students> {
                                                     padding: EdgeInsets.fromLTRB(
                                                         26.0, 10.0, 26.0, 10),
                                                     child: Text('Kabinets: '+
-                                                      data[0]["Classes"][index -
+                                                      data["Classes"][index -
                                                                           1]
                                                                       ["Lessons"]
                                                                   [i]["Rooms"][j]
@@ -340,7 +341,7 @@ class _StudentsState extends State<Students> {
                                                         26.0, 10.0, 26.0, 10),
                                                     child: Text(
                                                       'Priekšmets: ' +
-                                                          data[0]["Classes"][
+                                                          data["Classes"][
                                                                           index -
                                                                               1]
                                                                       ["Lessons"]
@@ -360,7 +361,7 @@ class _StudentsState extends State<Students> {
                                                         26.0, 10.0, 26.0, 10),
                                                     child: Text(
                                                       'Skolotājs: ' +
-                                                          data[0]["Classes"][
+                                                          data["Classes"][
                                                                           index -
                                                                               1]
                                                                       ["Lessons"]
@@ -380,7 +381,7 @@ class _StudentsState extends State<Students> {
                                                         26.0, 10.0, 26.0, 10),
                                                     child: Text(
                                                       'Piezīme: ' +
-                                                          data[0]["Classes"][
+                                                          data["Classes"][
                                                                           index -
                                                                               1]
                                                                       ["Lessons"]
@@ -407,7 +408,7 @@ class _StudentsState extends State<Students> {
                                                     padding: EdgeInsets.fromLTRB(
                                                         26.0, 10.0, 26.0, 10),
                                                     child: Text('Kabinets: '+
-                                                      data[0]["Classes"][index -
+                                                      data["Classes"][index -
                                                                           1]
                                                                       ["Lessons"]
                                                                   [i]["Rooms"][j]
@@ -426,7 +427,7 @@ class _StudentsState extends State<Students> {
                                                         26.0, 10.0, 26.0, 10),
                                                     child: Text(
                                                       'Priekšmets: ' +
-                                                          data[0]["Classes"][
+                                                          data["Classes"][
                                                                           index -
                                                                               1]
                                                                       ["Lessons"]
@@ -446,7 +447,7 @@ class _StudentsState extends State<Students> {
                                                         26.0, 10.0, 26.0, 10),
                                                     child: Text(
                                                       'Skolotājs: ' +
-                                                          data[0]["Classes"][index -
+                                                          data["Classes"][index -
                                                                               1][
                                                                           "Lessons"]
                                                                       [i]["Rooms"]
@@ -478,7 +479,7 @@ class _StudentsState extends State<Students> {
                                 26.0, 10.0, 26.0, 10),
                                 child: Text(
                                 'Stunda: ' +
-                                data[0]["Classes"][index - 1]
+                                data["Classes"][index - 1]
                                 ["Lessons"][i]["LessonNumber"] +
                                 '. ', //lessonnumber
                                 textAlign: TextAlign.left,

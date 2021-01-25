@@ -22,9 +22,10 @@ class _LoadingState extends State<Loading> {
     if (!(table.conerr || ttable.conerr)) {
       if (!(table.error || ttable.error)) {
         Navigator.pushReplacementNamed(context, '/st', arguments: {
-          'values': table.values,
-          //'values_tom': ttable.values,
-          'today_data':table.datatest,
+          't_values':table.teacherdata,
+
+          'values':table.datatest,
+          'values_tom':ttable.datatest,
         }); //if on local_preference '/t' or '/st'
       } else {
         //output warning
