@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:theme_provider/theme_provider.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import '../service/get.dart';
+import '../service/getTomorrow.dart';
 
 class Teacher extends StatefulWidget {
   @override
@@ -12,10 +15,11 @@ class _TeacherState extends State<Teacher> {
   Map lesson = {};
   bool dark_theme = false;
   var buttonIcon = Icons.bedtime;
-
+  GlobalKey<RefreshIndicatorState> refreshKey;
   @override
   void initState() {
     super.initState();
+    refreshKey=GlobalKey<RefreshIndicatorState>();
   }
 
   String lv_loc(String DayofWeek, int timestamp) {
@@ -130,14 +134,7 @@ class _TeacherState extends State<Teacher> {
     return lv;
   }
 
-  /*String dayWeek(int timestamp){
-    var now = new DateTime.now().toUtc();
-    var date = DateTime.fromMillisecondsSinceEpoch(timestamp * 1000).toUtc();
-    Duration difference=date.difference(now);
 
-    print('atsķiriba dienas '+difference.inDays.toString());
-    return difference.inDays.toString();
-  }*/
 
   @override
   Widget build(BuildContext context) {
@@ -198,6 +195,7 @@ class _TeacherState extends State<Teacher> {
                     'values': args['values'],
                     'values_tom': args['values_tom'],
                     't_values':args['t_values'],
+                    't_valuest':args['t_valuest'],
                   });
                 },
               ),
@@ -205,140 +203,180 @@ class _TeacherState extends State<Teacher> {
                 icon: const Icon(Icons.arrow_forward),
                 tooltip: 'Tomorrow',
                 onPressed: () {
-                  Navigator.pushReplacementNamed(context, '/stt', arguments: {
+                  Navigator.pushReplacementNamed(context, '/tt', arguments: {
                     'values': args['values'],
                     'values_tom': args['values_tom'],
                     't_values':args['t_values'],
+                    't_valuest':args['t_valuest'],
                   });
                 },
               ),
             ]),
-        body: Scrollbar(
-          child: ListView.builder(
-            padding: EdgeInsets.fromLTRB(0, 0, 0, 30.0),
-            itemCount: data["teachers"].length + 1,
-            itemBuilder: (context, index) {
-              if (index == 0) {
-                return Container(
-                  padding: EdgeInsets.fromLTRB(10.0, 20.0, 10.0, 10.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: <Widget>[
-                      Text(
-                        'Izmaiņas',
-                        style: Theme.of(context).textTheme.headline6,
-                      ),
-                      Text(
-                        datums,
-                        style: Theme.of(context).textTheme.headline6,
-                      ),
-                    ],
-                  ),
-                );
+        body: RefreshIndicator(
+          key: refreshKey,
+          onRefresh: () async {
+
+            getJson table = getJson(tryurl: 'https://jsonplaceholder.typicode.com/todos');
+            getJsonT ttable = getJsonT(tryurl: 'https://jsonplaceholder.typicode.com/todos');
+            await Future.wait([table.getData(), ttable.getData()]);
+            bool pr=!(!(!table.error && !ttable.error) || !(!table.conerr && !ttable.conerr));
+            print(pr.toString());
+            //
+            if (!(table.conerr || ttable.conerr)) {
+              if (!(table.error || ttable.error)) {
+                Navigator.pushReplacementNamed(context, '/t', arguments: {
+                  't_values':table.teacherdata,
+                  't_valuest':ttable.teacherdata,
+                  'values':table.datatest,
+                  'values_tom':ttable.datatest,
+                });
               } else {
-                final theme = Theme.of(context)
-                    .copyWith(dividerColor: Colors.transparent);
-                final divs = DividerTheme.of(context).copyWith(thickness: 2.0);
-                String name = data["teachers"][index - 1]["teacherName"];
-
-                return Card(
-                  //Class card
-                  margin: EdgeInsets.fromLTRB(32.0, 16.0, 32.0, 0),
-                  elevation: 3.0,
-                  child: Container(
-                    padding: EdgeInsets.fromLTRB(0.0, 10.0, 0.0, 10),
-                    child: Theme(
-                      data: theme, //new
-
-                      child: ExpansionTile(
-                        expandedCrossAxisAlignment: CrossAxisAlignment.start,
-                        title: Container(
-                          padding: EdgeInsets.fromLTRB(10.0, 10.0, 26.0, 10.0),
-                          child: Text(
-                            name, //Teacher
-                            style: Theme.of(context).textTheme.headline6,
-                          ),
-                        ),
-                        children: <Widget>[
-                          ListView.builder(
-                              shrinkWrap: true,
-                              physics: ScrollPhysics(),
-                              itemCount: data["teachers"][index - 1]["lessons"]
-                                  .length, //Lessons
-                              itemBuilder: (context, i) {
-                                return Column(
-                                  children: <Widget>[
-                                    DividerTheme(
-                                      data: divs,
-                                      child: Divider(
-                                          //color: Colors.black12,
-
-                                          ),
-                                    ),
-                                    Container(
-                                      padding: EdgeInsets.fromLTRB(
-                                          26.0, 10.0, 26.0, 10),
-                                      child: Text(
-                                        'Stunda: ' +
-                                            data["teachers"][index - 1]
-                                                ["lessons"][i]["lessonNumber"] +
-                                            '. ', //lessonnumber
-                                        textAlign: TextAlign.left,
-                                      ),
-                                    ),
-                                    Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: <Widget>[
-                                        Divider(),
-                                        Container(
-                                          padding: EdgeInsets.fromLTRB(
-                                              26.0, 10.0, 26.0, 10),
-                                          child: Text(
-                                            'Kabinets: ' +
-                                                data["teachers"][index - 1]
-                                                        ["lessons"][i]["room"] +
-                                                '. ', //room
-                                            textAlign: TextAlign.left,
-                                          ),
-                                        ),
-
-                                        Divider(),
-                                        Container(
-                                          padding: EdgeInsets.fromLTRB(
-                                              26.0, 10.0, 26.0, 10),
-                                          child: Text(
-                                            'Klase: ' +
-                                                data["teachers"][index - 1]
-                                                        ["lessons"][i]["class"],
-                                            //Class
-                                            textAlign: TextAlign.left,
-                                          ),
-                                        ),
-                                        Divider(),
-                                        Container(
-                                          padding: EdgeInsets.fromLTRB(
-                                              26.0, 10.0, 26.0, 10),
-                                          child: Text(
-                                            'Piezīme: ' +
-                                                data["teachers"][index - 1]
-                                                        ["lessons"][i]["note"]["noteText"],
-                                            //Notetext
-                                            textAlign: TextAlign.left,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ],
-                                );
-                              })
-                        ],
-                      ),
-                    ),
-                  ),
+                //output warning
+                Fluttertoast.showToast(
+                    msg: "Pārbaudiet Internet pieslēgumu",
+                    toastLength: Toast.LENGTH_SHORT,
+                    gravity: ToastGravity.BOTTOM,
+                    timeInSecForIosWeb: 2
                 );
               }
-            },
+            }else{
+              Fluttertoast.showToast(
+                  msg: "Ir problēma ar serveriem, mēģiniet velāk!",
+                  toastLength: Toast.LENGTH_SHORT,
+                  gravity: ToastGravity.BOTTOM,
+                  timeInSecForIosWeb: 2
+              );
+              print("hello");
+            }
+
+          },
+          child: Scrollbar(
+            child: ListView.builder(
+              padding: EdgeInsets.fromLTRB(0, 0, 0, 30.0),
+              itemCount: data["teachers"].length + 1,
+              itemBuilder: (context, index) {
+                if (index == 0) {
+                  return Container(
+                    padding: EdgeInsets.fromLTRB(10.0, 20.0, 10.0, 10.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: <Widget>[
+                        Text(
+                          'Izmaiņas',
+                          style: Theme.of(context).textTheme.headline6,
+                        ),
+                        Text(
+                          datums,
+                          style: Theme.of(context).textTheme.headline6,
+                        ),
+                      ],
+                    ),
+                  );
+                } else {
+                  final theme = Theme.of(context)
+                      .copyWith(dividerColor: Colors.transparent);
+                  final divs = DividerTheme.of(context).copyWith(thickness: 2.0);
+                  String name = data["teachers"][index - 1]["teacherName"];
+
+                  return Card(
+                    //Class card
+                    margin: EdgeInsets.fromLTRB(32.0, 16.0, 32.0, 0),
+                    elevation: 3.0,
+                    child: Container(
+                      padding: EdgeInsets.fromLTRB(0.0, 10.0, 0.0, 10),
+                      child: Theme(
+                        data: theme, //new
+
+                        child: ExpansionTile(
+                          expandedCrossAxisAlignment: CrossAxisAlignment.start,
+                          title: Container(
+                            padding: EdgeInsets.fromLTRB(10.0, 10.0, 26.0, 10.0),
+                            child: Text(
+                              name, //Teacher
+                              style: Theme.of(context).textTheme.headline6,
+                            ),
+                          ),
+                          children: <Widget>[
+                            ListView.builder(
+                                shrinkWrap: true,
+                                physics: ScrollPhysics(),
+                                itemCount: data["teachers"][index - 1]["lessons"]
+                                    .length, //Lessons
+                                itemBuilder: (context, i) {
+                                  return Column(
+                                    children: <Widget>[
+                                      DividerTheme(
+                                        data: divs,
+                                        child: Divider(
+                                            //color: Colors.black12,
+
+                                            ),
+                                      ),
+                                      Container(
+                                        padding: EdgeInsets.fromLTRB(
+                                            26.0, 10.0, 26.0, 10),
+                                        child: Text(
+                                          'Stunda: ' +
+                                              data["teachers"][index - 1]
+                                                  ["lessons"][i]["lessonNumber"] +
+                                              '. ', //lessonnumber
+                                          textAlign: TextAlign.left,
+                                        ),
+                                      ),
+                                      Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: <Widget>[
+                                          Divider(),
+                                          Container(
+                                            padding: EdgeInsets.fromLTRB(
+                                                26.0, 10.0, 26.0, 10),
+                                            child: Text(
+                                              'Kabinets: ' +
+                                                  data["teachers"][index - 1]
+                                                          ["lessons"][i]["room"] +
+                                                  '. ', //room
+                                              textAlign: TextAlign.left,
+                                            ),
+                                          ),
+
+                                          Divider(),
+                                          Container(
+                                            padding: EdgeInsets.fromLTRB(
+                                                26.0, 10.0, 26.0, 10),
+                                            child: Text(
+                                              'Klase: ' +
+                                                  data["teachers"][index - 1]
+                                                          ["lessons"][i]["class"],
+                                              //Class
+                                              textAlign: TextAlign.left,
+                                            ),
+                                          ),
+                                          Divider(),
+                                          Container(
+                                            padding: EdgeInsets.fromLTRB(
+                                                26.0, 10.0, 26.0, 10),
+                                            child: Text(
+                                              'Piezīme: ' +
+                                                  data["teachers"][index - 1]
+                                                          ["lessons"][i]["note"]["noteText"],
+                                              //Notetext
+                                              textAlign: TextAlign.left,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  );
+                                })
+                          ],
+                        ),
+                      ),
+                    ),
+                  );
+                }
+              },
+            ),
           ),
         ),
       ),

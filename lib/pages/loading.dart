@@ -23,7 +23,7 @@ class _LoadingState extends State<Loading> {
       if (!(table.error || ttable.error)) {
         Navigator.pushReplacementNamed(context, '/st', arguments: {
           't_values':table.teacherdata,
-
+          't_valuest':ttable.teacherdata,
           'values':table.datatest,
           'values_tom':ttable.datatest,
         }); //if on local_preference '/t' or '/st'
